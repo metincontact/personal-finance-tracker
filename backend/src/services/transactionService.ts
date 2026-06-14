@@ -110,17 +110,13 @@ export async function updateTransaction(id: string, data: {
 
 export async function getMonthlyTrend(months: number): Promise<{ m: string; v: number }[]> {
   const now = new Date();
-  const results: { m: string; v: number }[] = [];
-
-  for (let i = months - 1; i >= 0; i--) {
-    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const transactions = await getTransactionsByMonth(year, month);
-    const total = parseFloat(transactions.reduce((sum, t) => sum + t.amount, 0).toFixed(2));
+  const queries = Array.from({ length: months }, (_, i) => {
+    const date = new Date(now.getFullYear(), now.getMonth() - (months - 1 - i), 1);
     const label = date.toLocaleString('en-US', { month: 'short' });
-    results.push({ m: label, v: total });
-  }
-
-  return results;
+    return getTransactionsByMonth(date.getFullYear(), date.getMonth() + 1).then(txns => ({
+      m: label,
+      v: parseFloat(txns.reduce((sum, t) => sum + t.amount, 0).toFixed(2)),
+    }));
+  });
+  return Promise.all(queries);
 }

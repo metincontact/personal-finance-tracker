@@ -16,7 +16,6 @@ export default function App() {
       <div style={{ background: '#07080e', minHeight: '100vh' }}>
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-        {/* Mobile top bar */}
         <div
           className="mobile-hamburger"
           style={{
@@ -49,7 +48,6 @@ export default function App() {
           className="main-content"
           style={{ marginLeft: '240px', minHeight: '100vh', overflowY: 'auto' }}
         >
-          {/* Mobile top bar spacer */}
           <div className="mobile-hamburger" style={{ display: 'none', height: 56 }} />
 
           <Routes>

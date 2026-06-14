@@ -70,13 +70,11 @@ export default function Reports() {
 
   return (
     <div className="page-wrap" style={{ padding: '36px 40px', maxWidth: 1000 }}>
-      {/* Header */}
       <div style={{ marginBottom: 32 }}>
-        <p style={{ fontSize: 11, fontWeight: 600, color: '#1f2937', letterSpacing: '0.1em', marginBottom: 6 }}>ANALYTICS</p>
+        <p style={{ fontSize: 11, fontWeight: 600, color: '#374151', letterSpacing: '0.1em', marginBottom: 6 }}>ANALYTICS</p>
         <h1 style={{ fontSize: 28, fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.02em' }}>Reports</h1>
       </div>
 
-      {/* 3-card row */}
       <div className="stat-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 20 }}>
         <div className="stat-card" style={{ padding: 22 }}>
           <p style={{ fontSize: 11, fontWeight: 600, color: '#374151', letterSpacing: '0.06em', marginBottom: 14 }}>THIS MONTH</p>
@@ -106,7 +104,6 @@ export default function Reports() {
         </div>
       </div>
 
-      {/* Bar chart */}
       <div className="glass" style={{ padding: '24px 24px 16px', marginBottom: 16 }}>
         <div style={{ marginBottom: 20 }}>
           <p style={{ fontSize: 14, fontWeight: 600, color: '#f8fafc', letterSpacing: '-0.01em' }}>Spent vs Budget</p>
@@ -126,7 +123,6 @@ export default function Reports() {
         </ResponsiveContainer>
       </div>
 
-      {/* Category breakdown */}
       <div className="glass" style={{ padding: 24 }}>
         <p style={{ fontSize: 14, fontWeight: 600, color: '#f8fafc', letterSpacing: '-0.01em', marginBottom: 18 }}>Category Breakdown</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>

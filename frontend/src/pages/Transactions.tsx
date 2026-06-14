@@ -21,6 +21,7 @@ const CAT_LABEL: Record<string, string> = {
 };
 const CATEGORIES: Category[] = ['food', 'transport', 'shopping', 'entertainment', 'health', 'utilities', 'other'];
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const PAGE_SIZE = 20;
 
 const EMPTY_FORM = { date: '', amount: '', description: '', category: 'other' as Category, merchant: '' };
 
@@ -39,7 +40,6 @@ export default function Transactions() {
   const [formError, setFormError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [page, setPage] = useState(1);
-  const PAGE_SIZE = 20;
   const { toasts, showToast } = useToast();
 
   const fetchData = useCallback(() => {
@@ -188,14 +188,12 @@ export default function Transactions() {
     <div className="page-wrap" style={{ padding: '36px 40px', maxWidth: 1000 }}>
       <ToastStack toasts={toasts} />
 
-      {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 24 }}>
         <div>
-          <p style={{ fontSize: 11, fontWeight: 600, color: '#1f2937', letterSpacing: '0.1em', marginBottom: 6 }}>HISTORY</p>
+          <p style={{ fontSize: 11, fontWeight: 600, color: '#374151', letterSpacing: '0.1em', marginBottom: 6 }}>HISTORY</p>
           <h1 style={{ fontSize: 28, fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.02em' }}>Transactions</h1>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-          {/* Month Navigator */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: '2px 4px' }}>
             <button onClick={prevMonth} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px 8px', display: 'flex', alignItems: 'center', borderRadius: 8, color: '#374151', transition: 'color 0.1s' }}
               onMouseEnter={e => { e.currentTarget.style.color = '#e2e8f0'; }} onMouseLeave={e => { e.currentTarget.style.color = '#374151'; }}>
@@ -210,14 +208,12 @@ export default function Transactions() {
             </button>
           </div>
 
-          {/* Search */}
           <div style={{ position: 'relative' }}>
             <Search size={13} color="#374151" style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)' }} />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search..."
               style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, color: '#e2e8f0', fontSize: 13, padding: '9px 14px 9px 36px', outline: 'none', width: 180, backdropFilter: 'blur(20px)', fontFamily: 'Inter, sans-serif' }} />
           </div>
 
-          {/* Export CSV */}
           <button onClick={exportCSV} disabled={filtered.length === 0}
             style={{ display: 'flex', alignItems: 'center', gap: 7, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, color: filtered.length === 0 ? '#1f2937' : '#6b7280', fontSize: 13, fontWeight: 500, padding: '9px 14px', cursor: filtered.length === 0 ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.15s' }}
             onMouseEnter={e => { if (filtered.length > 0) { e.currentTarget.style.color = '#e2e8f0'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; }}}
@@ -226,7 +222,6 @@ export default function Transactions() {
             CSV
           </button>
 
-          {/* Add transaction */}
           <button onClick={openModal}
             style={{ display: 'flex', alignItems: 'center', gap: 7, background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)', borderRadius: 12, color: '#a5b4fc', fontSize: 13, fontWeight: 600, padding: '9px 16px', cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.15s' }}
             onMouseEnter={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.25)'; e.currentTarget.style.borderColor = 'rgba(99,102,241,0.5)'; }}
@@ -237,7 +232,6 @@ export default function Transactions() {
         </div>
       </div>
 
-      {/* Month summary */}
       {filtered.length > 0 && (
         <div style={{ display: 'flex', gap: 20, marginBottom: 16 }}>
           <p style={{ fontSize: 12, color: '#374151' }}>
@@ -248,18 +242,15 @@ export default function Transactions() {
         </div>
       )}
 
-      {/* Table */}
       <div className="glass" style={{ overflow: 'hidden' }}>
         <div style={{ overflowX: 'auto' }}>
           <div style={{ minWidth: 560 }}>
-            {/* Header row */}
             <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr 160px 100px 80px', padding: '12px 24px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
               {['Date', 'Merchant', 'Category', 'Amount', ''].map((h, i) => (
-                <span key={i} style={{ fontSize: 10, fontWeight: 600, color: '#1f2937', letterSpacing: '0.08em' }}>{h.toUpperCase()}</span>
+                <span key={i} style={{ fontSize: 10, fontWeight: 600, color: '#374151', letterSpacing: '0.08em' }}>{h.toUpperCase()}</span>
               ))}
             </div>
 
-            {/* Rows */}
             {paginated.map((t, i) => {
               const s = CAT[t.category] ?? CAT['other']!;
               const isDeleting = deletingId === t.id;
@@ -330,7 +321,6 @@ export default function Transactions() {
         </div>
       </div>
 
-      {/* Modal */}
       {showModal && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)' }}
           onClick={e => { if (e.target === e.currentTarget) closeModal(); }}>

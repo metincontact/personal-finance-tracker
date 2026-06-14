@@ -6,18 +6,10 @@ A personal finance dashboard that tracks, categorises, and visualises spending. 
 
 ---
 
-## Screenshots
-
-> Dashboard — spending overview, trend chart, and category breakdown
-
-![Dashboard](https://github.com/metincontact/personal-finance-tracker/assets/dashboard.png)
-
----
-
 ## Features
 
 - **Dashboard** — monthly stat cards, spending trend (area chart), category breakdown (donut chart)
-- **Transactions** — table with month filter, search, CSV export, add & delete
+- **Transactions** — table with month filter, search, CSV export, add, edit & delete
 - **Budget** — per-category progress bars with inline limit editing
 - **Reports** — bar chart comparison (spent vs budget), monthly summary
 - **Error handling** — retry states, toast notifications

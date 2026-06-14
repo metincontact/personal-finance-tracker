@@ -77,9 +77,8 @@ export default function Dashboard() {
 
   return (
     <div className="page-wrap" style={{ padding: '36px 40px', maxWidth: 1080 }}>
-      {/* Header */}
       <div style={{ marginBottom: 32 }}>
-        <p style={{ fontSize: 11, fontWeight: 600, color: '#1f2937', letterSpacing: '0.1em', marginBottom: 6 }}>
+        <p style={{ fontSize: 11, fontWeight: 600, color: '#374151', letterSpacing: '0.1em', marginBottom: 6 }}>
           {MONTHS[month - 1]?.toUpperCase()} {year}
         </p>
         <h1 style={{ fontSize: 28, fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
@@ -87,9 +86,7 @@ export default function Dashboard() {
         </h1>
       </div>
 
-      {/* Stat Cards */}
       <div className="stat-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
-        {/* Total Spent */}
         <div className="stat-card" style={{ padding: 22 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: '#374151', letterSpacing: '0.04em' }}>TOTAL SPENT</p>
@@ -100,12 +97,11 @@ export default function Dashboard() {
           <p className="gradient-text num-glow" style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1 }}>
             £{summary.totalSpent.toFixed(2)}
           </p>
-          <p style={{ fontSize: 11, color: '#1f2937', marginTop: 10, display: 'flex', alignItems: 'center', gap: 4 }}>
+          <p style={{ fontSize: 11, color: '#374151', marginTop: 10, display: 'flex', alignItems: 'center', gap: 4 }}>
             <ArrowUpRight size={11} color="#ef4444" /> This month
           </p>
         </div>
 
-        {/* Remaining */}
         <div className="stat-card" style={{ padding: 22 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: '#374151', letterSpacing: '0.04em' }}>REMAINING</p>
@@ -116,10 +112,9 @@ export default function Dashboard() {
           <p style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1, color: remaining >= 0 ? '#34d399' : '#ef4444', filter: `drop-shadow(0 0 10px ${remaining >= 0 ? 'rgba(52,211,153,0.3)' : 'rgba(239,68,68,0.3)'})` }}>
             £{Math.abs(remaining).toFixed(2)}
           </p>
-          <p style={{ fontSize: 11, color: '#1f2937', marginTop: 10 }}>of £{totalBudget} budget</p>
+          <p style={{ fontSize: 11, color: '#374151', marginTop: 10 }}>of £{totalBudget} budget</p>
         </div>
 
-        {/* Top Category */}
         <div className="stat-card" style={{ padding: 22 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: '#374151', letterSpacing: '0.04em' }}>TOP CATEGORY</p>
@@ -130,12 +125,11 @@ export default function Dashboard() {
           <p style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.1, color: '#f8fafc' }}>
             {topEntry ? (CAT_LABEL[topEntry[0]] ?? topEntry[0]) : '—'}
           </p>
-          <p style={{ fontSize: 11, color: '#1f2937', marginTop: 10 }}>
+          <p style={{ fontSize: 11, color: '#374151', marginTop: 10 }}>
             £{topEntry ? topEntry[1].toFixed(2) : '0'} spent
           </p>
         </div>
 
-        {/* Budget Used */}
         <div className="stat-card" style={{ padding: 22 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: '#374151', letterSpacing: '0.04em' }}>BUDGET USED</p>
@@ -152,9 +146,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Charts */}
       <div className="chart-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 16 }}>
-        {/* Area Chart */}
         <div className="glass" style={{ padding: '24px 24px 16px' }}>
           <div style={{ marginBottom: 20 }}>
             <p style={{ fontSize: 14, fontWeight: 600, color: '#f8fafc', letterSpacing: '-0.01em' }}>Spending Trend</p>
@@ -179,7 +171,6 @@ export default function Dashboard() {
           </ResponsiveContainer>
         </div>
 
-        {/* Donut + legend */}
         <div className="glass" style={{ padding: 24 }}>
           <p style={{ fontSize: 14, fontWeight: 600, color: '#f8fafc', letterSpacing: '-0.01em', marginBottom: 4 }}>By Category</p>
           <p style={{ fontSize: 11, color: '#374151', marginBottom: 16 }}>This month</p>

@@ -21,7 +21,7 @@ export default function ErrorState({ message = 'Failed to load data', onRetry }:
         </div>
         <p style={{ color: '#fca5a5', fontSize: 15, fontWeight: 700, marginBottom: 6 }}>{message}</p>
         <p style={{ color: '#374151', fontSize: 12, lineHeight: 1.6, marginBottom: onRetry ? 24 : 0 }}>
-          Make sure the backend is running on port 3000
+          Check your connection and try again.
         </p>
         {onRetry && (
           <button

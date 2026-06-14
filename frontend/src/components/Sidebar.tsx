@@ -16,7 +16,6 @@ interface Props {
 export default function Sidebar({ isOpen, onClose }: Props) {
   return (
     <>
-      {/* Mobile overlay */}
       <div
         className="sidebar-overlay"
         onClick={onClose}
@@ -43,7 +42,6 @@ export default function Sidebar({ isOpen, onClose }: Props) {
           flexDirection: 'column',
         }}
       >
-        {/* Logo */}
         <div style={{ padding: '28px 20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{
@@ -56,10 +54,9 @@ export default function Sidebar({ isOpen, onClose }: Props) {
             </div>
             <div>
               <p style={{ fontSize: 14, fontWeight: 700, color: '#f1f5f9', letterSpacing: '-0.01em' }}>Finance</p>
-              <p style={{ fontSize: 11, color: '#1f2937', marginTop: 1, fontWeight: 500 }}>Personal Tracker</p>
+              <p style={{ fontSize: 11, color: '#4b5563', marginTop: 1, fontWeight: 500 }}>Personal Tracker</p>
             </div>
           </div>
-          {/* Close button (mobile only) */}
           <button
             onClick={onClose}
             className="mobile-hamburger"
@@ -71,9 +68,8 @@ export default function Sidebar({ isOpen, onClose }: Props) {
 
         <div className="divider" style={{ margin: '0 16px' }} />
 
-        {/* Nav */}
         <nav style={{ flex: 1, padding: '16px 10px', display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <p style={{ fontSize: 10, fontWeight: 600, color: '#1f2937', letterSpacing: '0.1em', padding: '0 8px', marginBottom: 8 }}>
+          <p style={{ fontSize: 10, fontWeight: 600, color: '#374151', letterSpacing: '0.1em', padding: '0 8px', marginBottom: 8 }}>
             NAVIGATION
           </p>
           {links.map(({ to, label, icon: Icon, end }) => (
@@ -95,7 +91,6 @@ export default function Sidebar({ isOpen, onClose }: Props) {
           ))}
         </nav>
 
-        {/* Bottom status card */}
         <div style={{ padding: '16px 12px 24px' }}>
           <div style={{
             background: 'linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(168,85,247,0.05) 100%)',
@@ -107,8 +102,8 @@ export default function Sidebar({ isOpen, onClose }: Props) {
               <span style={{ fontSize: 12, fontWeight: 600, color: '#a5b4fc' }}>Mock Data</span>
               <div style={{ marginLeft: 'auto', width: 6, height: 6, borderRadius: '50%', background: '#10b981', boxShadow: '0 0 8px #10b981' }} />
             </div>
-            <p style={{ fontSize: 11, color: '#374151', lineHeight: 1.5 }}>
-              Connect Santander to sync live transactions
+            <p style={{ fontSize: 11, color: '#4b5563', lineHeight: 1.5 }}>
+              Connect your bank to sync live transactions
             </p>
           </div>
         </div>

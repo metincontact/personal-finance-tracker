@@ -1,18 +1,19 @@
 import { useEffect, useState, useCallback } from 'react';
 import { getBudgets, updateBudget } from '../services/api';
 import type { Budget } from '../types';
-import { AlertTriangle, CheckCircle, Pencil, X, Check } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Pencil, X, Check, Utensils, Car, ShoppingBag, Film, Heart, Zap, Package } from 'lucide-react';
 import ErrorState from '../components/ErrorState';
 import ToastStack from '../components/ToastStack';
 import { useToast } from '../hooks/useToast';
+import type { ComponentType } from 'react';
 
 const LABEL: Record<string, string> = {
   food: 'Food & Drink', transport: 'Transport', shopping: 'Shopping',
   entertainment: 'Entertainment', health: 'Health', utilities: 'Utilities', other: 'Other',
 };
-const EMOJI: Record<string, string> = {
-  food: '🍽️', transport: '🚇', shopping: '🛍️',
-  entertainment: '🎬', health: '💊', utilities: '⚡', other: '📦',
+const CAT_ICON: Record<string, ComponentType<{ size?: number; color?: string }>> = {
+  food: Utensils, transport: Car, shopping: ShoppingBag,
+  entertainment: Film, health: Heart, utilities: Zap, other: Package,
 };
 const COLOR: Record<string, string> = {
   food: '#818cf8', transport: '#fbbf24', shopping: '#f472b6',
@@ -30,15 +31,17 @@ export default function BudgetPage() {
   const { toasts, showToast } = useToast();
 
   const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
 
   const fetchBudgets = useCallback(() => {
     setLoading(true);
     setPageError(false);
-    getBudgets(now.getFullYear(), now.getMonth() + 1)
+    getBudgets(year, month)
       .then(data => { setBudgets(data); })
       .catch(() => setPageError(true))
       .finally(() => setLoading(false));
-  }, [now.getFullYear(), now.getMonth()]);
+  }, [year, month]);
 
   useEffect(() => { fetchBudgets(); }, [fetchBudgets]);
 
@@ -90,10 +93,9 @@ export default function BudgetPage() {
   return (
     <div className="page-wrap" style={{ padding: '36px 40px', maxWidth: 1000 }}>
       <ToastStack toasts={toasts} />
-      {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 32 }}>
         <div>
-          <p style={{ fontSize: 11, fontWeight: 600, color: '#1f2937', letterSpacing: '0.1em', marginBottom: 6 }}>MONTHLY</p>
+          <p style={{ fontSize: 11, fontWeight: 600, color: '#374151', letterSpacing: '0.1em', marginBottom: 6 }}>MONTHLY</p>
           <h1 style={{ fontSize: 28, fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.02em' }}>Budget</h1>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 500, color: overCount > 0 ? '#ef4444' : '#34d399' }}>
@@ -104,7 +106,6 @@ export default function BudgetPage() {
         </div>
       </div>
 
-      {/* Total overview */}
       <div className="glass" style={{ padding: '20px 24px', marginBottom: 20 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <p style={{ fontSize: 13, fontWeight: 600, color: '#e2e8f0' }}>Total Budget</p>
@@ -125,7 +126,6 @@ export default function BudgetPage() {
         </div>
       </div>
 
-      {/* Budget Grid */}
       <div className="budget-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14 }}>
         {budgets.map(b => {
           const pct = Math.min((b.spent / b.limit) * 100, 100);
@@ -133,24 +133,23 @@ export default function BudgetPage() {
           const isWarn = !isOver && pct > 75;
           const accent = isOver ? '#ef4444' : isWarn ? '#fbbf24' : (COLOR[b.category] ?? '#818cf8');
           const isEditing = editingCategory === b.category;
+          const CategoryIcon = CAT_ICON[b.category] ?? Package;
 
           return (
             <div key={b.category} className="glass" style={{ padding: 22 }}>
-              {/* Top row */}
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 18 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <div style={{
-                    width: 40, height: 40, borderRadius: 12, fontSize: 18,
+                    width: 40, height: 40, borderRadius: 12,
                     background: 'rgba(255,255,255,0.04)',
                     border: '1px solid rgba(255,255,255,0.07)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
-                    {EMOJI[b.category]}
+                    <CategoryIcon size={18} color={COLOR[b.category] ?? '#818cf8'} />
                   </div>
                   <div>
                     <p style={{ fontSize: 14, fontWeight: 600, color: '#f8fafc' }}>{LABEL[b.category] ?? b.category}</p>
 
-                    {/* Edit mode or display */}
                     {isEditing ? (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 5 }}>
                         <span style={{ fontSize: 12, color: '#374151' }}>£</span>
@@ -214,12 +213,10 @@ export default function BudgetPage() {
                 )}
               </div>
 
-              {/* Error */}
               {isEditing && fieldError && (
                 <p style={{ fontSize: 11, color: '#ef4444', marginBottom: 10 }}>{fieldError}</p>
               )}
 
-              {/* Progress bar */}
               <div className="bar-track" style={{ height: 5, marginBottom: 10 }}>
                 <div
                   className={isOver ? 'bar-fill bar-fill-danger' : isWarn ? 'bar-fill bar-fill-warn' : 'bar-fill'}
@@ -227,7 +224,6 @@ export default function BudgetPage() {
                 />
               </div>
 
-              {/* Bottom row */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: 15, fontWeight: 700, color: accent, fontVariantNumeric: 'tabular-nums', filter: `drop-shadow(0 0 6px ${accent}55)` }}>
                   £{b.spent.toFixed(2)}
