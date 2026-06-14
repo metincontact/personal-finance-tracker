@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
-import { getTransactions, addTransaction, deleteTransaction } from '../services/api';
+import { getTransactions, addTransaction, deleteTransaction, updateTransaction } from '../services/api';
 import type { Transaction, Category } from '../types';
-import { Search, Plus, Trash2, X, ChevronLeft, ChevronRight, Download } from 'lucide-react';
+import { Search, Plus, Trash2, X, ChevronLeft, ChevronRight, Download, Pencil } from 'lucide-react';
 import ErrorState from '../components/ErrorState';
 import ToastStack from '../components/ToastStack';
 import { useToast } from '../hooks/useToast';
@@ -33,10 +33,13 @@ export default function Transactions() {
   const [selectedYear, setSelectedYear] = useState(now.getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(now.getMonth() + 1);
   const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 20;
   const { toasts, showToast } = useToast();
 
   const fetchData = useCallback(() => {
@@ -51,10 +54,12 @@ export default function Transactions() {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const prevMonth = () => {
+    setPage(1);
     if (selectedMonth === 1) { setSelectedMonth(12); setSelectedYear(y => y - 1); }
     else setSelectedMonth(m => m - 1);
   };
   const nextMonth = () => {
+    setPage(1);
     if (selectedMonth === 12) { setSelectedMonth(1); setSelectedYear(y => y + 1); }
     else setSelectedMonth(m => m + 1);
   };
@@ -69,6 +74,9 @@ export default function Transactions() {
     t.description.toLowerCase().includes(search.toLowerCase()) ||
     t.category.toLowerCase().includes(search.toLowerCase())
   );
+
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const exportCSV = () => {
     const header = 'Date,Merchant,Description,Category,Amount (£)\n';
@@ -88,12 +96,26 @@ export default function Transactions() {
   };
 
   const openModal = () => {
+    setEditingId(null);
     setForm({ ...EMPTY_FORM, date: new Date().toISOString().slice(0, 10) });
     setFormError(null);
     setShowModal(true);
   };
 
-  const closeModal = () => { setShowModal(false); setFormError(null); };
+  const openEdit = (t: Transaction) => {
+    setEditingId(t.id);
+    setForm({
+      date: new Date(t.date).toISOString().slice(0, 10),
+      amount: String(t.amount),
+      description: t.description,
+      category: t.category,
+      merchant: t.merchant,
+    });
+    setFormError(null);
+    setShowModal(true);
+  };
+
+  const closeModal = () => { setShowModal(false); setFormError(null); setEditingId(null); };
 
   const handleSave = async () => {
     if (!form.date || !form.amount || !form.merchant) {
@@ -105,17 +127,26 @@ export default function Transactions() {
     setSaving(true);
     setFormError(null);
     try {
-      await addTransaction({
-        date: form.date, amount,
-        description: form.description || form.merchant,
-        category: form.category, merchant: form.merchant,
-      });
+      if (editingId) {
+        await updateTransaction(editingId, {
+          date: form.date, amount,
+          description: form.description || form.merchant,
+          category: form.category, merchant: form.merchant,
+        });
+        showToast('Transaction updated');
+      } else {
+        await addTransaction({
+          date: form.date, amount,
+          description: form.description || form.merchant,
+          category: form.category, merchant: form.merchant,
+        });
+        showToast('Transaction added');
+      }
       setShowModal(false);
-      showToast('Transaction added');
       fetchData();
     } catch {
       setFormError('Failed to save. Try again.');
-      showToast('Failed to add transaction', 'error');
+      showToast('Failed to save transaction', 'error');
     } finally {
       setSaving(false);
     }
@@ -222,19 +253,19 @@ export default function Transactions() {
         <div style={{ overflowX: 'auto' }}>
           <div style={{ minWidth: 560 }}>
             {/* Header row */}
-            <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr 160px 100px 44px', padding: '12px 24px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr 160px 100px 80px', padding: '12px 24px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
               {['Date', 'Merchant', 'Category', 'Amount', ''].map((h, i) => (
                 <span key={i} style={{ fontSize: 10, fontWeight: 600, color: '#1f2937', letterSpacing: '0.08em' }}>{h.toUpperCase()}</span>
               ))}
             </div>
 
             {/* Rows */}
-            {filtered.map((t, i) => {
+            {paginated.map((t, i) => {
               const s = CAT[t.category] ?? CAT['other']!;
               const isDeleting = deletingId === t.id;
               return (
                 <div key={t.id}
-                  style={{ display: 'grid', gridTemplateColumns: '110px 1fr 160px 100px 44px', padding: '15px 24px', borderBottom: i < filtered.length - 1 ? '1px solid rgba(255,255,255,0.035)' : 'none', alignItems: 'center', transition: 'background 0.12s ease', opacity: isDeleting ? 0.4 : 1 }}
+                  style={{ display: 'grid', gridTemplateColumns: '110px 1fr 160px 100px 80px', padding: '15px 24px', borderBottom: i < paginated.length - 1 ? '1px solid rgba(255,255,255,0.035)' : 'none', alignItems: 'center', transition: 'background 0.12s ease', opacity: isDeleting ? 0.4 : 1 }}
                   onMouseEnter={e => { if (!isDeleting) e.currentTarget.style.background = 'rgba(255,255,255,0.02)'; }}
                   onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}>
                   <span style={{ fontSize: 13, color: '#374151', fontVariantNumeric: 'tabular-nums' }}>
@@ -255,7 +286,14 @@ export default function Transactions() {
                   <span style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc', fontVariantNumeric: 'tabular-nums', textAlign: 'right' }}>
                     £{t.amount.toFixed(2)}
                   </span>
-                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: 4 }}>
+                    <button onClick={() => openEdit(t)} disabled={isDeleting}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', borderRadius: 6, display: 'flex', alignItems: 'center', opacity: 0.25, transition: 'opacity 0.12s' }}
+                      onMouseEnter={e => { e.currentTarget.style.opacity = '1'; }}
+                      onMouseLeave={e => { e.currentTarget.style.opacity = '0.25'; }}
+                      title="Edit">
+                      <Pencil size={13} color="#818cf8" />
+                    </button>
                     <button onClick={() => handleDelete(t.id)} disabled={isDeleting}
                       style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', borderRadius: 6, display: 'flex', alignItems: 'center', opacity: 0.25, transition: 'opacity 0.12s' }}
                       onMouseEnter={e => { e.currentTarget.style.opacity = '1'; }}
@@ -274,6 +312,20 @@ export default function Transactions() {
                 <p style={{ color: '#1f2937', fontSize: 11, marginTop: 6 }}>Use the arrows to navigate months or add a transaction</p>
               </div>
             )}
+
+            {totalPages > 1 && (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '16px 24px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
+                  style={{ background: 'none', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 8, color: page === 1 ? '#1f2937' : '#6b7280', padding: '6px 10px', cursor: page === 1 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center' }}>
+                  <ChevronLeft size={14} />
+                </button>
+                <span style={{ fontSize: 12, color: '#374151' }}>Page {page} of {totalPages}</span>
+                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
+                  style={{ background: 'none', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 8, color: page === totalPages ? '#1f2937' : '#6b7280', padding: '6px 10px', cursor: page === totalPages ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center' }}>
+                  <ChevronRight size={14} />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -286,7 +338,7 @@ export default function Transactions() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
               <div>
                 <p style={{ fontSize: 11, fontWeight: 600, color: '#374151', letterSpacing: '0.1em', marginBottom: 4 }}>MANUAL ENTRY</p>
-                <h2 style={{ fontSize: 20, fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.02em' }}>Add Transaction</h2>
+                <h2 style={{ fontSize: 20, fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.02em' }}>{editingId ? 'Edit Transaction' : 'Add Transaction'}</h2>
               </div>
               <button onClick={closeModal} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '6px', cursor: 'pointer', display: 'flex' }}>
                 <X size={15} color="#374151" />
@@ -335,7 +387,7 @@ export default function Transactions() {
                 style={{ background: saving ? 'rgba(99,102,241,0.1)' : 'rgba(99,102,241,0.2)', border: '1px solid rgba(99,102,241,0.35)', borderRadius: 12, color: saving ? '#4b5563' : '#a5b4fc', fontSize: 14, fontWeight: 700, padding: '13px', cursor: saving ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', width: '100%', transition: 'all 0.15s', letterSpacing: '0.02em' }}
                 onMouseEnter={e => { if (!saving) e.currentTarget.style.background = 'rgba(99,102,241,0.3)'; }}
                 onMouseLeave={e => { if (!saving) e.currentTarget.style.background = 'rgba(99,102,241,0.2)'; }}>
-                {saving ? 'Saving...' : 'Save Transaction'}
+                {saving ? 'Saving...' : editingId ? 'Update Transaction' : 'Save Transaction'}
               </button>
             </div>
           </div>

@@ -80,3 +80,26 @@ export async function removeTransaction(req: Request, res: Response) {
     res.status(500).json({ error: 'Failed to delete transaction' });
   }
 }
+
+export async function editTransaction(req: Request, res: Response) {
+  const { id } = req.params;
+  const { date, amount, description, category, merchant } = req.body as {
+    date?: string; amount?: number; description?: string; category?: string; merchant?: string;
+  };
+  try {
+    const data = await svc.updateTransaction(String(id), { date, amount, description, category, merchant });
+    res.json(data);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to update transaction' });
+  }
+}
+
+export async function getTrend(req: Request, res: Response) {
+  const months = parseInt(String(req.params['months'] ?? '6'));
+  try {
+    const data = await svc.getMonthlyTrend(isNaN(months) ? 6 : months);
+    res.json(data);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to fetch trend' });
+  }
+}

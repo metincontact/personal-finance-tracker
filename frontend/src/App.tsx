@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
 import BudgetPage from './pages/Budget';
 import Reports from './pages/Reports';
+import NotFound from './pages/NotFound';
 import { Menu, Wallet } from 'lucide-react';
 
 export default function App() {
@@ -56,6 +57,7 @@ export default function App() {
             <Route path="/transactions" element={<Transactions />} />
             <Route path="/budget" element={<BudgetPage />} />
             <Route path="/reports" element={<Reports />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
       </div>

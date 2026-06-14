@@ -24,3 +24,11 @@ export const addTransaction = (data: {
 
 export const deleteTransaction = (id: string): Promise<void> =>
   api.delete(`/transactions/${id}`).then((r) => r.data);
+
+export const updateTransaction = (id: string, data: {
+  date?: string; amount?: number; description?: string; category?: string; merchant?: string;
+}): Promise<void> =>
+  api.patch(`/transactions/${id}`, data).then((r) => r.data);
+
+export const getMonthlyTrend = (months: number): Promise<{ m: string; v: number }[]> =>
+  api.get<{ m: string; v: number }[]>(`/transactions/trend/${months}`).then((r) => r.data);

@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { getMonthlySummary } from '../services/api';
+import { getMonthlySummary, getMonthlyTrend } from '../services/api';
 import type { MonthlySummary } from '../types';
 import ErrorState from '../components/ErrorState';
 import {
@@ -17,10 +17,6 @@ const CAT_LABEL: Record<string, string> = {
   entertainment: 'Entertainment', health: 'Health', utilities: 'Utilities', other: 'Other',
 };
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const trendData = [
-  { m: 'Feb', v: 320 }, { m: 'Mar', v: 410 }, { m: 'Apr', v: 375 },
-  { m: 'May', v: 488 }, { m: 'Jun', v: 500 },
-];
 
 const ChartTip = ({ active, payload }: { active?: boolean; payload?: Array<{ value: number }> }) => {
   if (!active || !payload?.length) return null;
@@ -44,6 +40,7 @@ const PieTip = ({ active, payload }: { active?: boolean; payload?: Array<{ name:
 
 export default function Dashboard() {
   const [summary, setSummary] = useState<MonthlySummary | null>(null);
+  const [trendData, setTrendData] = useState<{ m: string; v: number }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const now = new Date();
@@ -52,8 +49,11 @@ export default function Dashboard() {
   const fetchData = useCallback(() => {
     setLoading(true);
     setError(false);
-    getMonthlySummary(year, month)
-      .then(setSummary)
+    Promise.all([
+      getMonthlySummary(year, month),
+      getMonthlyTrend(6),
+    ])
+      .then(([s, t]) => { setSummary(s); setTrendData(t); })
       .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, [year, month]);
@@ -158,7 +158,7 @@ export default function Dashboard() {
         <div className="glass" style={{ padding: '24px 24px 16px' }}>
           <div style={{ marginBottom: 20 }}>
             <p style={{ fontSize: 14, fontWeight: 600, color: '#f8fafc', letterSpacing: '-0.01em' }}>Spending Trend</p>
-            <p style={{ fontSize: 11, color: '#374151', marginTop: 3 }}>Last 5 months</p>
+            <p style={{ fontSize: 11, color: '#374151', marginTop: 3 }}>Last 6 months</p>
           </div>
           <ResponsiveContainer width="100%" height={210}>
             <AreaChart data={trendData} margin={{ top: 10, right: 10, left: -18, bottom: 0 }}>

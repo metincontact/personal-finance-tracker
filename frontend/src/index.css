@@ -172,12 +172,16 @@ body::after {
   .sidebar-nav.sidebar-open { transform: translateX(0); }
   .sidebar-overlay { display: block !important; }
   .main-content { margin-left: 0 !important; }
-  .page-wrap { padding: 20px 16px !important; }
+  .page-wrap { padding: 20px 16px 40px !important; }
   .stat-grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
-  .stat-grid-3 { grid-template-columns: repeat(2, 1fr) !important; }
+  .stat-grid-3 { grid-template-columns: 1fr !important; }
   .chart-grid { grid-template-columns: 1fr !important; }
   .budget-grid { grid-template-columns: 1fr !important; }
   .mobile-hamburger { display: flex !important; }
+  .page-header-actions { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
+}
+@media (max-width: 480px) {
+  .stat-grid-4 { grid-template-columns: 1fr !important; }
 }
 @media (min-width: 769px) {
   .sidebar-nav { transform: none !important; }
