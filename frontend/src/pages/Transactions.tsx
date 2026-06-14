@@ -4,7 +4,46 @@ import type { Transaction, Category } from '../types';
 import { Search, Plus, Trash2, X, ChevronLeft, ChevronRight, Download, Pencil } from 'lucide-react';
 import ErrorState from '../components/ErrorState';
 import ToastStack from '../components/ToastStack';
+import Skeleton from '../components/Skeleton';
 import { useToast } from '../hooks/useToast';
+
+function TransactionsSkeleton() {
+  return (
+    <div className="page-wrap" style={{ padding: '36px 40px', maxWidth: 1000 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 24 }}>
+        <div>
+          <Skeleton width={56} height={10} style={{ marginBottom: 10 }} />
+          <Skeleton width={160} height={28} />
+        </div>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <Skeleton width={120} height={36} radius={12} />
+          <Skeleton width={140} height={36} radius={12} />
+          <Skeleton width={60} height={36} radius={12} />
+          <Skeleton width={72} height={36} radius={12} />
+        </div>
+      </div>
+      <div className="glass" style={{ overflow: 'hidden' }}>
+        <div style={{ padding: '12px 24px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: 16 }}>
+          {[110, 200, 130, 80, 60].map((w, i) => (
+            <Skeleton key={i} width={w} height={10} />
+          ))}
+        </div>
+        {[0, 1, 2, 3, 4, 5].map(i => (
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 24px', borderBottom: '1px solid rgba(255,255,255,0.035)' }}>
+            <Skeleton width={70} height={13} />
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 5 }}>
+              <Skeleton width={120} height={13} />
+              <Skeleton width={80} height={10} />
+            </div>
+            <Skeleton width={90} height={22} radius={99} />
+            <Skeleton width={60} height={14} style={{ marginLeft: 'auto' }} />
+            <Skeleton width={40} height={28} radius={6} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 const CAT: Record<string, { bg: string; color: string; dot: string }> = {
   food:          { bg: 'rgba(129,140,248,0.1)',  color: '#a5b4fc', dot: '#818cf8' },
@@ -165,11 +204,7 @@ export default function Transactions() {
     }
   };
 
-  if (loading) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
-      <p style={{ color: '#374151', fontSize: 13 }}>Loading...</p>
-    </div>
-  );
+  if (loading) return <TransactionsSkeleton />;
   if (pageError) return <ErrorState message="Failed to load transactions" onRetry={fetchData} />;
 
   const inputStyle: React.CSSProperties = {

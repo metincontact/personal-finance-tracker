@@ -4,8 +4,52 @@ import type { Budget } from '../types';
 import { AlertTriangle, CheckCircle, Pencil, X, Check, Utensils, Car, ShoppingBag, Film, Heart, Zap, Package } from 'lucide-react';
 import ErrorState from '../components/ErrorState';
 import ToastStack from '../components/ToastStack';
+import Skeleton from '../components/Skeleton';
 import { useToast } from '../hooks/useToast';
 import type { ComponentType } from 'react';
+
+function BudgetSkeleton() {
+  return (
+    <div className="page-wrap" style={{ padding: '36px 40px', maxWidth: 1000 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 32 }}>
+        <div>
+          <Skeleton width={56} height={10} style={{ marginBottom: 10 }} />
+          <Skeleton width={90} height={28} />
+        </div>
+        <Skeleton width={110} height={16} />
+      </div>
+      <div className="glass" style={{ padding: '20px 24px', marginBottom: 20 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
+          <Skeleton width={90} height={13} />
+          <Skeleton width={100} height={13} />
+        </div>
+        <Skeleton height={6} radius={99} style={{ marginBottom: 10 }} />
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Skeleton width={60} height={11} />
+          <Skeleton width={80} height={11} />
+        </div>
+      </div>
+      <div className="budget-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14 }}>
+        {[0, 1, 2, 3, 4, 5, 6].map(i => (
+          <div key={i} className="glass" style={{ padding: 22 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18 }}>
+              <Skeleton width={40} height={40} radius={12} />
+              <div>
+                <Skeleton width={100} height={14} style={{ marginBottom: 8 }} />
+                <Skeleton width={70} height={11} />
+              </div>
+            </div>
+            <Skeleton height={5} radius={99} style={{ marginBottom: 10 }} />
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Skeleton width={60} height={15} />
+              <Skeleton width={30} height={12} />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 const LABEL: Record<string, string> = {
   food: 'Food & Drink', transport: 'Transport', shopping: 'Shopping',
@@ -78,11 +122,7 @@ export default function BudgetPage() {
     }
   };
 
-  if (loading) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
-      <p style={{ color: '#374151', fontSize: 13 }}>Loading...</p>
-    </div>
-  );
+  if (loading) return <BudgetSkeleton />;
   if (pageError) return <ErrorState message="Failed to load budgets" onRetry={fetchBudgets} />;
 
   const totalLimit = budgets.reduce((s, b) => s + b.limit, 0);

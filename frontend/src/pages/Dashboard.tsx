@@ -2,11 +2,53 @@ import { useEffect, useState, useCallback } from 'react';
 import { getMonthlySummary, getMonthlyTrend } from '../services/api';
 import type { MonthlySummary } from '../types';
 import ErrorState from '../components/ErrorState';
+import Skeleton from '../components/Skeleton';
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
 } from 'recharts';
 import { TrendingUp, TrendingDown, ShoppingBag, Zap, ArrowUpRight } from 'lucide-react';
+
+function DashboardSkeleton() {
+  return (
+    <div className="page-wrap" style={{ padding: '36px 40px', maxWidth: 1080 }}>
+      <div style={{ marginBottom: 32 }}>
+        <Skeleton width={56} height={10} style={{ marginBottom: 10 }} />
+        <Skeleton width={140} height={28} />
+      </div>
+      <div className="stat-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
+        {[0, 1, 2, 3].map(i => (
+          <div key={i} className="stat-card" style={{ padding: 22 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
+              <Skeleton width={80} height={10} />
+              <Skeleton width={28} height={28} radius={8} />
+            </div>
+            <Skeleton width={110} height={26} style={{ marginBottom: 12 }} />
+            <Skeleton width={70} height={10} />
+          </div>
+        ))}
+      </div>
+      <div className="chart-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 16 }}>
+        <div className="glass" style={{ padding: '24px 24px 16px' }}>
+          <Skeleton width={130} height={14} style={{ marginBottom: 8 }} />
+          <Skeleton width={80} height={10} style={{ marginBottom: 24 }} />
+          <Skeleton height={210} radius={12} />
+        </div>
+        <div className="glass" style={{ padding: 24 }}>
+          <Skeleton width={100} height={14} style={{ marginBottom: 8 }} />
+          <Skeleton width={70} height={10} style={{ marginBottom: 20 }} />
+          <Skeleton width={120} height={120} radius={60} style={{ margin: '0 auto 20px' }} />
+          {[0, 1, 2, 3].map(i => (
+            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+              <Skeleton width={100} height={11} />
+              <Skeleton width={36} height={11} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const CAT_COLOR: Record<string, string> = {
   food: '#818cf8', transport: '#fbbf24', shopping: '#f472b6',
@@ -60,11 +102,7 @@ export default function Dashboard() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  if (loading) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
-      <p style={{ color: '#374151', fontSize: 13 }}>Loading...</p>
-    </div>
-  );
+  if (loading) return <DashboardSkeleton />;
   if (error || !summary) return <ErrorState message="Failed to load dashboard" onRetry={fetchData} />;
 
   const pieData = Object.entries(summary.byCategory).map(([cat, value]) => ({
