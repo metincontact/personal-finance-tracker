@@ -1,5 +1,5 @@
-import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, ArrowLeftRight, Target, BarChart3, Wallet, Radio, X } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, ArrowLeftRight, Target, BarChart3, Wallet, Radio, X, LogOut } from 'lucide-react';
 import { useCurrency, CURRENCIES } from '../context/CurrencyContext';
 import type { CurrencyCode } from '../context/CurrencyContext';
 
@@ -17,6 +17,12 @@ interface Props {
 
 export default function Sidebar({ isOpen, onClose }: Props) {
   const { currency, setCurrency } = useCurrency();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('auth_token');
+    navigate('/login');
+  };
 
   return (
     <>
@@ -117,7 +123,7 @@ export default function Sidebar({ isOpen, onClose }: Props) {
           </div>
         </div>
 
-        <div style={{ padding: '0 12px 24px' }}>
+        <div style={{ padding: '0 12px 16px' }}>
           <div style={{
             background: 'linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(168,85,247,0.05) 100%)',
             border: '1px solid rgba(99,102,241,0.15)',
@@ -132,6 +138,18 @@ export default function Sidebar({ isOpen, onClose }: Props) {
               Import PDF from Transactions to sync your data
             </p>
           </div>
+        </div>
+
+        <div style={{ padding: '0 12px 24px' }}>
+          <button
+            onClick={handleLogout}
+            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '9px 12px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 10, color: '#374151', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.15s' }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.2)'; e.currentTarget.style.background = 'rgba(239,68,68,0.05)'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = '#374151'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'; e.currentTarget.style.background = 'rgba(255,255,255,0.02)'; }}
+          >
+            <LogOut size={14} />
+            Sign Out
+          </button>
         </div>
       </aside>
     </>
