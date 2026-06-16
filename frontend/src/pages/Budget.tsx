@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { getBudgets, updateBudget } from '../services/api';
 import type { Budget } from '../types';
 import { AlertTriangle, CheckCircle, Pencil, X, Check, Utensils, Car, ShoppingBag, Film, Heart, Zap, Package } from 'lucide-react';
+import { useCurrency } from '../context/CurrencyContext';
 import ErrorState from '../components/ErrorState';
 import ToastStack from '../components/ToastStack';
 import Skeleton from '../components/Skeleton';
@@ -65,6 +66,7 @@ const COLOR: Record<string, string> = {
 };
 
 export default function BudgetPage() {
+  const { fmt, symbol, toPLN } = useCurrency();
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [loading, setLoading] = useState(true);
   const [pageError, setPageError] = useState(false);
@@ -91,7 +93,7 @@ export default function BudgetPage() {
 
   const startEdit = (b: Budget) => {
     setEditingCategory(b.category);
-    setEditValue(String(b.limit));
+    setEditValue((b.limit * (1 / toPLN(1))).toFixed(2));
     setFieldError(null);
   };
 
@@ -102,11 +104,12 @@ export default function BudgetPage() {
   };
 
   const saveEdit = async (category: string) => {
-    const limit = parseFloat(editValue);
-    if (isNaN(limit) || limit <= 0) {
+    const limitInCurrency = parseFloat(editValue);
+    if (isNaN(limitInCurrency) || limitInCurrency <= 0) {
       setFieldError('Please enter a valid amount');
       return;
     }
+    const limit = parseFloat(toPLN(limitInCurrency).toFixed(2));
     setSaving(true);
     setFieldError(null);
     try {
@@ -150,8 +153,8 @@ export default function BudgetPage() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <p style={{ fontSize: 13, fontWeight: 600, color: '#e2e8f0' }}>Total Budget</p>
           <p style={{ fontSize: 13, fontVariantNumeric: 'tabular-nums' }}>
-            <span style={{ color: '#818cf8', fontWeight: 700 }}>£{totalSpent.toFixed(2)}</span>
-            <span style={{ color: '#374151' }}> / £{totalLimit.toFixed(0)}</span>
+            <span style={{ color: '#818cf8', fontWeight: 700 }}>{fmt(totalSpent)}</span>
+            <span style={{ color: '#374151' }}> / {fmt(totalLimit)}</span>
           </p>
         </div>
         <div className="bar-track" style={{ height: 6 }}>
@@ -162,7 +165,7 @@ export default function BudgetPage() {
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
           <span style={{ fontSize: 11, color: '#374151' }}>{totalPct.toFixed(0)}% used</span>
-          <span style={{ fontSize: 11, color: '#374151' }}>£{(totalLimit - totalSpent).toFixed(2)} remaining</span>
+          <span style={{ fontSize: 11, color: '#374151' }}>{fmt(totalLimit - totalSpent)} remaining</span>
         </div>
       </div>
 
@@ -192,7 +195,7 @@ export default function BudgetPage() {
 
                     {isEditing ? (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 5 }}>
-                        <span style={{ fontSize: 12, color: '#374151' }}>£</span>
+                        <span style={{ fontSize: 12, color: '#374151' }}>{symbol}</span>
                         <input
                           type="number"
                           value={editValue}
@@ -231,7 +234,7 @@ export default function BudgetPage() {
                       </div>
                     ) : (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3 }}>
-                        <p style={{ fontSize: 11, color: '#374151' }}>£{b.limit.toFixed(0)} limit</p>
+                        <p style={{ fontSize: 11, color: '#374151' }}>{fmt(b.limit)} limit</p>
                         <button
                           onClick={() => startEdit(b)}
                           style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px 4px', borderRadius: 4, display: 'flex', alignItems: 'center', opacity: 0.5 }}
@@ -266,14 +269,14 @@ export default function BudgetPage() {
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: 15, fontWeight: 700, color: accent, fontVariantNumeric: 'tabular-nums', filter: `drop-shadow(0 0 6px ${accent}55)` }}>
-                  £{b.spent.toFixed(2)}
+                  {fmt(b.spent)}
                 </span>
                 <span style={{ fontSize: 12, fontWeight: 500, color: '#374151' }}>{pct.toFixed(0)}%</span>
               </div>
 
               {isOver && (
                 <p style={{ fontSize: 11, color: '#ef4444', marginTop: 6 }}>
-                  +£{(b.spent - b.limit).toFixed(2)} over budget
+                  +{fmt(b.spent - b.limit)} over budget
                 </p>
               )}
             </div>

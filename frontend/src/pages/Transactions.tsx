@@ -1,7 +1,8 @@
 import { useEffect, useState, useCallback } from 'react';
-import { getTransactions, addTransaction, deleteTransaction, updateTransaction } from '../services/api';
+import { getTransactions, addTransaction, deleteTransaction, updateTransaction, importPDF } from '../services/api';
+import { useCurrency } from '../context/CurrencyContext';
 import type { Transaction, Category } from '../types';
-import { Search, Plus, Trash2, X, ChevronLeft, ChevronRight, Download, Pencil } from 'lucide-react';
+import { Search, Plus, Trash2, X, ChevronLeft, ChevronRight, Download, Pencil, Upload } from 'lucide-react';
 import ErrorState from '../components/ErrorState';
 import ToastStack from '../components/ToastStack';
 import Skeleton from '../components/Skeleton';
@@ -79,7 +80,9 @@ export default function Transactions() {
   const [formError, setFormError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [page, setPage] = useState(1);
+  const [importing, setImporting] = useState(false);
   const { toasts, showToast } = useToast();
+  const { fmt, currency } = useCurrency();
 
   const fetchData = useCallback(() => {
     setLoading(true);
@@ -118,11 +121,11 @@ export default function Transactions() {
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const exportCSV = () => {
-    const header = 'Date,Merchant,Description,Category,Amount (£)\n';
+    const header = `Date,Merchant,Description,Category,Amount (${currency})\n`;
     const rows = filtered.map(t => {
       const date = new Date(t.date).toLocaleDateString('en-GB');
       const desc = `"${t.description.replace(/"/g, '""')}"`;
-      return `${date},${t.merchant},${desc},${CAT_LABEL[t.category] ?? t.category},${t.amount.toFixed(2)}`;
+      return `${date},${t.merchant},${desc},${CAT_LABEL[t.category] ?? t.category},${fmt(t.amount)}`;
     }).join('\n');
     const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -191,6 +194,22 @@ export default function Transactions() {
     }
   };
 
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = '';
+    setImporting(true);
+    try {
+      const result = await importPDF(file);
+      showToast(`Imported ${result.imported} transactions${result.skipped ? `, ${result.skipped} skipped (duplicates)` : ''}`);
+      fetchData();
+    } catch {
+      showToast('Failed to import PDF', 'error');
+    } finally {
+      setImporting(false);
+    }
+  };
+
   const handleDelete = async (id: string) => {
     setDeletingId(id);
     try {
@@ -249,6 +268,14 @@ export default function Transactions() {
               style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, color: '#e2e8f0', fontSize: 13, padding: '9px 14px 9px 36px', outline: 'none', width: 180, backdropFilter: 'blur(20px)', fontFamily: 'Inter, sans-serif' }} />
           </div>
 
+          <label style={{ display: 'flex', alignItems: 'center', gap: 7, background: importing ? 'rgba(255,255,255,0.01)' : 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, color: importing ? '#374151' : '#6b7280', fontSize: 13, fontWeight: 500, padding: '9px 14px', cursor: importing ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.15s' }}
+            onMouseEnter={e => { if (!importing) { (e.currentTarget as HTMLElement).style.color = '#e2e8f0'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.15)'; }}}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#6b7280'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)'; }}>
+            <Upload size={13} />
+            {importing ? 'Importing…' : 'Import PDF'}
+            <input type="file" accept=".pdf" onChange={handleImport} disabled={importing} style={{ display: 'none' }} />
+          </label>
+
           <button onClick={exportCSV} disabled={filtered.length === 0}
             style={{ display: 'flex', alignItems: 'center', gap: 7, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, color: filtered.length === 0 ? '#1f2937' : '#6b7280', fontSize: 13, fontWeight: 500, padding: '9px 14px', cursor: filtered.length === 0 ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.15s' }}
             onMouseEnter={e => { if (filtered.length > 0) { e.currentTarget.style.color = '#e2e8f0'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; }}}
@@ -270,7 +297,7 @@ export default function Transactions() {
       {filtered.length > 0 && (
         <div style={{ display: 'flex', gap: 20, marginBottom: 16 }}>
           <p style={{ fontSize: 12, color: '#374151' }}>
-            <span style={{ color: '#818cf8', fontWeight: 700 }}>£{totalSpent.toFixed(2)}</span>
+            <span style={{ color: '#818cf8', fontWeight: 700 }}>{fmt(totalSpent)}</span>
             {' '}spent in {MONTHS[selectedMonth - 1]}
           </p>
           <p style={{ fontSize: 12, color: '#374151' }}>{filtered.length} transactions</p>
@@ -310,7 +337,7 @@ export default function Transactions() {
                     </span>
                   </div>
                   <span style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc', fontVariantNumeric: 'tabular-nums', textAlign: 'right' }}>
-                    £{t.amount.toFixed(2)}
+                    {fmt(t.amount)}
                   </span>
                   <div style={{ display: 'flex', justifyContent: 'center', gap: 4 }}>
                     <button onClick={() => openEdit(t)} disabled={isDeleting}
@@ -377,7 +404,7 @@ export default function Transactions() {
                   <input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} style={{ ...inputStyle, colorScheme: 'dark' }} />
                 </div>
                 <div>
-                  <label style={labelStyle}>AMOUNT (£)</label>
+                  <label style={labelStyle}>AMOUNT (PLN)</label>
                   <input type="number" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} placeholder="0.00" min="0" step="0.01" style={inputStyle} />
                 </div>
               </div>

@@ -8,6 +8,7 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
 } from 'recharts';
 import { TrendingUp, TrendingDown, ShoppingBag, Zap, ArrowUpRight } from 'lucide-react';
+import { useCurrency } from '../context/CurrencyContext';
 
 function DashboardSkeleton() {
   return (
@@ -64,7 +65,7 @@ const ChartTip = ({ active, payload }: { active?: boolean; payload?: Array<{ val
   if (!active || !payload?.length) return null;
   return (
     <div style={{ background: '#0f1117', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '8px 14px', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}>
-      <p style={{ color: '#818cf8', fontWeight: 600, fontSize: 13 }}>£{payload[0]?.value?.toFixed(2)}</p>
+      <p style={{ color: '#818cf8', fontWeight: 600, fontSize: 13 }}>{fmt(payload[0]?.value ?? 0)}</p>
     </div>
   );
 };
@@ -75,12 +76,13 @@ const PieTip = ({ active, payload }: { active?: boolean; payload?: Array<{ name:
   return (
     <div style={{ background: '#0f1117', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '8px 14px', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}>
       <p style={{ color: d.payload.color, fontWeight: 600, fontSize: 12 }}>{d.name}</p>
-      <p style={{ color: '#e2e8f0', fontSize: 13, marginTop: 2 }}>£{d.value.toFixed(2)}</p>
+      <p style={{ color: '#e2e8f0', fontSize: 13, marginTop: 2 }}>{fmt(d.value)}</p>
     </div>
   );
 };
 
 export default function Dashboard() {
+  const { fmt } = useCurrency();
   const [summary, setSummary] = useState<MonthlySummary | null>(null);
   const [trendData, setTrendData] = useState<{ m: string; v: number }[]>([]);
   const [loading, setLoading] = useState(true);
@@ -133,7 +135,7 @@ export default function Dashboard() {
             </div>
           </div>
           <p className="gradient-text num-glow" style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1 }}>
-            £{summary.totalSpent.toFixed(2)}
+            {fmt(summary.totalSpent)}
           </p>
           <p style={{ fontSize: 11, color: '#374151', marginTop: 10, display: 'flex', alignItems: 'center', gap: 4 }}>
             <ArrowUpRight size={11} color="#ef4444" /> This month
@@ -148,9 +150,9 @@ export default function Dashboard() {
             </div>
           </div>
           <p style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1, color: remaining >= 0 ? '#34d399' : '#ef4444', filter: `drop-shadow(0 0 10px ${remaining >= 0 ? 'rgba(52,211,153,0.3)' : 'rgba(239,68,68,0.3)'})` }}>
-            £{Math.abs(remaining).toFixed(2)}
+            {fmt(Math.abs(remaining))}
           </p>
-          <p style={{ fontSize: 11, color: '#374151', marginTop: 10 }}>of £{totalBudget} budget</p>
+          <p style={{ fontSize: 11, color: '#374151', marginTop: 10 }}>of {fmt(totalBudget)} budget</p>
         </div>
 
         <div className="stat-card" style={{ padding: 22 }}>
@@ -164,7 +166,7 @@ export default function Dashboard() {
             {topEntry ? (CAT_LABEL[topEntry[0]] ?? topEntry[0]) : '—'}
           </p>
           <p style={{ fontSize: 11, color: '#374151', marginTop: 10 }}>
-            £{topEntry ? topEntry[1].toFixed(2) : '0'} spent
+            {fmt(topEntry ? topEntry[1] : 0)} spent
           </p>
         </div>
 
@@ -200,7 +202,7 @@ export default function Dashboard() {
               </defs>
               <CartesianGrid stroke="rgba(255,255,255,0.03)" vertical={false} />
               <XAxis dataKey="m" tick={{ fill: '#374151', fontSize: 11, fontFamily: 'Inter' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: '#374151', fontSize: 11, fontFamily: 'Inter' }} axisLine={false} tickLine={false} tickFormatter={(v) => `£${v}`} />
+              <YAxis tick={{ fill: '#374151', fontSize: 11, fontFamily: 'Inter' }} axisLine={false} tickLine={false} tickFormatter={(v) => fmt(v)} />
               <Tooltip content={<ChartTip />} />
               <Area type="monotone" dataKey="v" stroke="#818cf8" strokeWidth={2} fill="url(#grad)"
                 dot={{ fill: '#818cf8', r: 3, strokeWidth: 0 }}
@@ -227,7 +229,7 @@ export default function Dashboard() {
                   <div style={{ width: 6, height: 6, borderRadius: '50%', background: d.color, flexShrink: 0, boxShadow: `0 0 6px ${d.color}` }} />
                   <span style={{ fontSize: 12, color: '#6b7280' }}>{d.name}</span>
                 </div>
-                <span style={{ fontSize: 12, fontWeight: 600, color: '#e2e8f0', fontVariantNumeric: 'tabular-nums' }}>£{d.value.toFixed(0)}</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#e2e8f0', fontVariantNumeric: 'tabular-nums' }}>{fmt(d.value)}</span>
               </div>
             ))}
           </div>

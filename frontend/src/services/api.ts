@@ -32,3 +32,11 @@ export const updateTransaction = (id: string, data: {
 
 export const getMonthlyTrend = (months: number): Promise<{ m: string; v: number }[]> =>
   api.get<{ m: string; v: number }[]>(`/transactions/trend/${months}`).then((r) => r.data);
+
+export const importPDF = (file: File): Promise<{ imported: number; skipped: number }> => {
+  const form = new FormData();
+  form.append('file', file);
+  return api.post<{ imported: number; skipped: number }>('/import/pdf', form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }).then((r) => r.data);
+};

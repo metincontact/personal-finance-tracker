@@ -1,5 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, ArrowLeftRight, Target, BarChart3, Wallet, Radio, X } from 'lucide-react';
+import { useCurrency, CURRENCIES } from '../context/CurrencyContext';
+import type { CurrencyCode } from '../context/CurrencyContext';
 
 const links = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
@@ -14,6 +16,8 @@ interface Props {
 }
 
 export default function Sidebar({ isOpen, onClose }: Props) {
+  const { currency, setCurrency } = useCurrency();
+
   return (
     <>
       <div
@@ -91,7 +95,29 @@ export default function Sidebar({ isOpen, onClose }: Props) {
           ))}
         </nav>
 
-        <div style={{ padding: '16px 12px 24px' }}>
+        <div style={{ padding: '0 12px 16px' }}>
+          <p style={{ fontSize: 10, fontWeight: 600, color: '#374151', letterSpacing: '0.1em', padding: '0 4px', marginBottom: 8 }}>CURRENCY</p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4 }}>
+            {CURRENCIES.map(c => (
+              <button
+                key={c.code}
+                onClick={() => setCurrency(c.code as CurrencyCode)}
+                style={{
+                  background: currency === c.code ? 'rgba(99,102,241,0.2)' : 'rgba(255,255,255,0.03)',
+                  border: `1px solid ${currency === c.code ? 'rgba(99,102,241,0.5)' : 'rgba(255,255,255,0.07)'}`,
+                  borderRadius: 8, padding: '6px 4px', cursor: 'pointer',
+                  color: currency === c.code ? '#a5b4fc' : '#374151',
+                  fontSize: 11, fontWeight: 600, fontFamily: 'Inter, sans-serif',
+                  transition: 'all 0.15s',
+                }}
+              >
+                {c.symbol} {c.code}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ padding: '0 12px 24px' }}>
           <div style={{
             background: 'linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(168,85,247,0.05) 100%)',
             border: '1px solid rgba(99,102,241,0.15)',
@@ -99,11 +125,11 @@ export default function Sidebar({ isOpen, onClose }: Props) {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
               <Radio size={12} color="#10b981" />
-              <span style={{ fontSize: 12, fontWeight: 600, color: '#a5b4fc' }}>Mock Data</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#a5b4fc' }}>Erste Bank</span>
               <div style={{ marginLeft: 'auto', width: 6, height: 6, borderRadius: '50%', background: '#10b981', boxShadow: '0 0 8px #10b981' }} />
             </div>
             <p style={{ fontSize: 11, color: '#4b5563', lineHeight: 1.5 }}>
-              Connect your bank to sync live transactions
+              Import PDF from Transactions to sync your data
             </p>
           </div>
         </div>

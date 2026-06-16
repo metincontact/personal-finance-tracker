@@ -155,3 +155,19 @@ describe('GET unknown route', () => {
     expect(res.status).toBe(404);
   });
 });
+
+describe('POST /api/import/pdf', () => {
+  it('returns 400 when no file is uploaded', async () => {
+    const res = await request(app).post('/api/import/pdf');
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error');
+  });
+
+  it('returns 400 when uploaded file is not a PDF', async () => {
+    const res = await request(app)
+      .post('/api/import/pdf')
+      .attach('file', Buffer.from('not a pdf'), { filename: 'test.txt', contentType: 'text/plain' });
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error');
+  });
+});

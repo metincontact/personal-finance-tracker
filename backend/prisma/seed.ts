@@ -8,40 +8,40 @@ async function main() {
 
   await prisma.transaction.createMany({
     data: [
-      { date: new Date('2026-06-01'), amount: 45.20, description: 'Tesco Superstore', category: 'food', merchant: 'Tesco' },
-      { date: new Date('2026-06-02'), amount: 12.50, description: 'TfL Travel', category: 'transport', merchant: 'TfL' },
-      { date: new Date('2026-06-03'), amount: 89.99, description: 'ASOS Order', category: 'shopping', merchant: 'ASOS' },
-      { date: new Date('2026-06-04'), amount: 15.00, description: 'Netflix', category: 'entertainment', merchant: 'Netflix' },
-      { date: new Date('2026-06-05'), amount: 32.80, description: "Sainsbury's", category: 'food', merchant: "Sainsbury's" },
-      { date: new Date('2026-06-06'), amount: 8.50, description: 'Bus Pass', category: 'transport', merchant: 'Arriva' },
-      { date: new Date('2026-06-07'), amount: 120.00, description: 'Electricity Bill', category: 'utilities', merchant: 'British Gas' },
-      { date: new Date('2026-06-08'), amount: 25.00, description: 'Gym Membership', category: 'health', merchant: 'PureGym' },
-      { date: new Date('2026-06-09'), amount: 67.40, description: 'Zara', category: 'shopping', merchant: 'Zara' },
-      { date: new Date('2026-06-10'), amount: 18.90, description: "McDonald's", category: 'food', merchant: "McDonald's" },
-      { date: new Date('2026-06-11'), amount: 9.99, description: 'Spotify', category: 'entertainment', merchant: 'Spotify' },
-      { date: new Date('2026-06-12'), amount: 55.00, description: 'Lidl', category: 'food', merchant: 'Lidl' },
-      { date: new Date('2026-05-15'), amount: 78.30, description: 'Asda', category: 'food', merchant: 'Asda' },
-      { date: new Date('2026-05-18'), amount: 45.00, description: 'Uber', category: 'transport', merchant: 'Uber' },
-      { date: new Date('2026-05-22'), amount: 200.00, description: 'Amazon', category: 'shopping', merchant: 'Amazon' },
-      { date: new Date('2026-05-25'), amount: 30.00, description: 'Cinema', category: 'entertainment', merchant: 'Odeon' },
-      { date: new Date('2026-05-28'), amount: 95.00, description: 'Water Bill', category: 'utilities', merchant: 'Thames Water' },
-      { date: new Date('2026-05-30'), amount: 40.00, description: 'Pharmacy', category: 'health', merchant: 'Boots' },
+      { date: new Date('2026-06-01'), amount: 32.50, description: 'Biedronka', category: 'food', merchant: 'Biedronka' },
+      { date: new Date('2026-06-02'), amount: 9.60, description: 'ZTM Bilet', category: 'transport', merchant: 'ZTM' },
+      { date: new Date('2026-06-03'), amount: 219.99, description: 'Zalando', category: 'shopping', merchant: 'Zalando' },
+      { date: new Date('2026-06-04'), amount: 43.00, description: 'Netflix', category: 'entertainment', merchant: 'Netflix' },
+      { date: new Date('2026-06-05'), amount: 58.30, description: 'Lidl', category: 'food', merchant: 'Lidl' },
+      { date: new Date('2026-06-06'), amount: 12.00, description: 'Bolt Przejazd', category: 'transport', merchant: 'Bolt' },
+      { date: new Date('2026-06-07'), amount: 340.00, description: 'PGE Energia', category: 'utilities', merchant: 'PGE' },
+      { date: new Date('2026-06-08'), amount: 120.00, description: 'Medicover', category: 'health', merchant: 'Medicover' },
+      { date: new Date('2026-06-09'), amount: 189.90, description: 'H&M', category: 'shopping', merchant: 'H&M' },
+      { date: new Date('2026-06-10'), amount: 28.50, description: 'McDonald\'s', category: 'food', merchant: 'McDonald\'s' },
+      { date: new Date('2026-06-11'), amount: 26.99, description: 'Spotify', category: 'entertainment', merchant: 'Spotify' },
+      { date: new Date('2026-06-12'), amount: 74.20, description: 'Kaufland', category: 'food', merchant: 'Kaufland' },
+      { date: new Date('2026-05-15'), amount: 145.00, description: 'Allegro', category: 'shopping', merchant: 'Allegro' },
+      { date: new Date('2026-05-18'), amount: 22.40, description: 'Uber', category: 'transport', merchant: 'Uber' },
+      { date: new Date('2026-05-22'), amount: 67.80, description: 'Rossmann', category: 'health', merchant: 'Rossmann' },
+      { date: new Date('2026-05-25'), amount: 55.00, description: 'Helios Cinema', category: 'entertainment', merchant: 'Helios' },
+      { date: new Date('2026-05-28'), amount: 189.00, description: 'Orange Rachunek', category: 'utilities', merchant: 'Orange' },
+      { date: new Date('2026-05-30'), amount: 38.90, description: 'Apteka Dr. Max', category: 'health', merchant: 'Apteka Dr. Max' },
     ],
   });
 
   await prisma.budget.createMany({
     data: [
-      { category: 'food',          limit: 300 },
-      { category: 'transport',     limit: 100 },
-      { category: 'shopping',      limit: 200 },
-      { category: 'entertainment', limit: 50  },
-      { category: 'health',        limit: 80  },
-      { category: 'utilities',     limit: 150 },
-      { category: 'other',         limit: 100 },
+      { category: 'food',          limit: 1500 },
+      { category: 'transport',     limit: 300  },
+      { category: 'shopping',      limit: 800  },
+      { category: 'entertainment', limit: 200  },
+      { category: 'health',        limit: 300  },
+      { category: 'utilities',     limit: 500  },
+      { category: 'other',         limit: 400  },
     ],
   });
 
-  console.log('✅ Database seeded');
+  console.log('Seeded with Polish PLN data');
 }
 
 main()

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
+import { CurrencyProvider } from './context/CurrencyContext';
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
 import BudgetPage from './pages/Budget';
@@ -12,6 +13,7 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
+    <CurrencyProvider>
     <BrowserRouter>
       <div style={{ background: '#07080e', minHeight: '100vh' }}>
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
@@ -60,5 +62,6 @@ export default function App() {
         </main>
       </div>
     </BrowserRouter>
+    </CurrencyProvider>
   );
 }
