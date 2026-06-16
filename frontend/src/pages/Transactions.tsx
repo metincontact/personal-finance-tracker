@@ -81,6 +81,7 @@ export default function Transactions() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [importing, setImporting] = useState(false);
+  const [catFilter, setCatFilter] = useState<string>('all');
   const { toasts, showToast } = useToast();
   const { fmt, currency } = useCurrency();
 
@@ -111,7 +112,9 @@ export default function Transactions() {
     return d.getFullYear() === selectedYear && d.getMonth() + 1 === selectedMonth;
   });
 
-  const filtered = monthFiltered.filter(t =>
+  const catFiltered = catFilter === 'all' ? monthFiltered : monthFiltered.filter(t => t.category === catFilter);
+
+  const filtered = catFiltered.filter(t =>
     t.merchant.toLowerCase().includes(search.toLowerCase()) ||
     t.description.toLowerCase().includes(search.toLowerCase()) ||
     t.category.toLowerCase().includes(search.toLowerCase())
@@ -262,9 +265,15 @@ export default function Transactions() {
             </button>
           </div>
 
+          <select value={catFilter} onChange={e => { setCatFilter(e.target.value); setPage(1); }}
+            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, color: catFilter === 'all' ? '#6b7280' : '#a5b4fc', fontSize: 13, padding: '9px 12px', outline: 'none', cursor: 'pointer', fontFamily: 'Inter, sans-serif', colorScheme: 'dark' }}>
+            <option value="all">All Categories</option>
+            {CATEGORIES.map(cat => <option key={cat} value={cat}>{CAT_LABEL[cat]}</option>)}
+          </select>
+
           <div style={{ position: 'relative' }}>
             <Search size={13} color="#374151" style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)' }} />
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search..."
+            <input value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} placeholder="Search..."
               style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, color: '#e2e8f0', fontSize: 13, padding: '9px 14px 9px 36px', outline: 'none', width: 180, backdropFilter: 'blur(20px)', fontFamily: 'Inter, sans-serif' }} />
           </div>
 

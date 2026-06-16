@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { getBudgets, updateBudget } from '../services/api';
 import type { Budget } from '../types';
-import { AlertTriangle, CheckCircle, Pencil, X, Check, Utensils, Car, ShoppingBag, Film, Heart, Zap, Package } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Pencil, X, Check, Plus, Utensils, Car, ShoppingBag, Film, Heart, Zap, Package } from 'lucide-react';
 import { useCurrency } from '../context/CurrencyContext';
 import ErrorState from '../components/ErrorState';
 import ToastStack from '../components/ToastStack';
@@ -74,6 +74,11 @@ export default function BudgetPage() {
   const [editValue, setEditValue] = useState('');
   const [saving, setSaving] = useState(false);
   const [fieldError, setFieldError] = useState<string | null>(null);
+  const [showNewCat, setShowNewCat] = useState(false);
+  const [newCatName, setNewCatName] = useState('');
+  const [newCatLimit, setNewCatLimit] = useState('');
+  const [newCatError, setNewCatError] = useState<string | null>(null);
+  const [savingNew, setSavingNew] = useState(false);
   const { toasts, showToast } = useToast();
 
   const now = new Date();
@@ -101,6 +106,28 @@ export default function BudgetPage() {
     setEditingCategory(null);
     setEditValue('');
     setFieldError(null);
+  };
+
+  const saveNewCategory = async () => {
+    const name = newCatName.trim().toLowerCase().replace(/\s+/g, '_');
+    const limitInCurrency = parseFloat(newCatLimit);
+    if (!name) { setNewCatError('Enter a category name'); return; }
+    if (isNaN(limitInCurrency) || limitInCurrency <= 0) { setNewCatError('Enter a valid limit'); return; }
+    if (budgets.find(b => b.category === name)) { setNewCatError('Category already exists'); return; }
+    setSavingNew(true);
+    setNewCatError(null);
+    try {
+      await updateBudget(name, parseFloat(toPLN(limitInCurrency).toFixed(2)));
+      setShowNewCat(false);
+      setNewCatName('');
+      setNewCatLimit('');
+      showToast('Category added');
+      fetchBudgets();
+    } catch {
+      setNewCatError('Failed to save');
+    } finally {
+      setSavingNew(false);
+    }
   };
 
   const saveEdit = async (category: string) => {
@@ -168,6 +195,36 @@ export default function BudgetPage() {
           <span style={{ fontSize: 11, color: '#374151' }}>{fmt(totalLimit - totalSpent)} remaining</span>
         </div>
       </div>
+
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+        <button onClick={() => { setShowNewCat(v => !v); setNewCatError(null); }}
+          style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.25)', borderRadius: 10, color: '#818cf8', fontSize: 12, fontWeight: 600, padding: '7px 14px', cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+          {showNewCat ? <X size={12} /> : <Plus size={12} />}
+          {showNewCat ? 'Cancel' : 'Add Category'}
+        </button>
+      </div>
+
+      {showNewCat && (
+        <div className="glass" style={{ padding: '20px 24px', marginBottom: 14, display: 'flex', alignItems: 'flex-end', gap: 12, flexWrap: 'wrap' }}>
+          <div style={{ flex: 1, minWidth: 140 }}>
+            <p style={{ fontSize: 11, fontWeight: 600, color: '#374151', letterSpacing: '0.07em', marginBottom: 6 }}>CATEGORY NAME</p>
+            <input value={newCatName} onChange={e => setNewCatName(e.target.value)} placeholder="e.g. gym, pets..."
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: 8, color: '#f8fafc', fontSize: 13, padding: '8px 12px', outline: 'none', width: '100%', fontFamily: 'Inter, sans-serif', boxSizing: 'border-box' }}
+              onKeyDown={e => e.key === 'Enter' && saveNewCategory()} />
+          </div>
+          <div style={{ width: 140 }}>
+            <p style={{ fontSize: 11, fontWeight: 600, color: '#374151', letterSpacing: '0.07em', marginBottom: 6 }}>MONTHLY LIMIT ({symbol})</p>
+            <input type="number" value={newCatLimit} onChange={e => setNewCatLimit(e.target.value)} placeholder="0.00" min="0" step="0.01"
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: 8, color: '#f8fafc', fontSize: 13, padding: '8px 12px', outline: 'none', width: '100%', fontFamily: 'Inter, sans-serif', boxSizing: 'border-box' }}
+              onKeyDown={e => e.key === 'Enter' && saveNewCategory()} />
+          </div>
+          <button onClick={saveNewCategory} disabled={savingNew}
+            style={{ background: 'rgba(99,102,241,0.2)', border: '1px solid rgba(99,102,241,0.35)', borderRadius: 8, color: '#a5b4fc', fontSize: 13, fontWeight: 600, padding: '8px 18px', cursor: savingNew ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap' }}>
+            {savingNew ? 'Saving…' : 'Add'}
+          </button>
+          {newCatError && <p style={{ fontSize: 12, color: '#ef4444', width: '100%' }}>{newCatError}</p>}
+        </div>
+      )}
 
       <div className="budget-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14 }}>
         {budgets.map(b => {

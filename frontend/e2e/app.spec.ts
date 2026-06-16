@@ -53,6 +53,42 @@ test.describe('Transactions page', () => {
   test('shows month navigator', async ({ page }) => {
     await expect(page.getByText(/jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec/i).first()).toBeVisible({ timeout: 8000 });
   });
+
+  test('shows category filter with All Categories option', async ({ page }) => {
+    const select = page.locator('select');
+    await expect(select).toBeVisible({ timeout: 8000 });
+    await expect(select.locator('option[value="all"]')).toHaveText('All Categories');
+  });
+
+  test('shows Import PDF button', async ({ page }) => {
+    await expect(page.getByText('Import PDF')).toBeVisible({ timeout: 8000 });
+  });
+});
+
+test.describe('Budget page', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/budget');
+    await page.waitForLoadState('networkidle');
+    await page.getByRole('heading', { name: 'Budget' }).waitFor({ timeout: 10000 });
+  });
+
+  test('shows Add Category button', async ({ page }) => {
+    await expect(page.getByRole('button', { name: /add category/i })).toBeVisible({ timeout: 8000 });
+  });
+
+  test('shows new category form when Add Category is clicked', async ({ page }) => {
+    await page.getByRole('button', { name: /add category/i }).click();
+    await expect(page.getByPlaceholder(/gym|pets/i)).toBeVisible({ timeout: 4000 });
+  });
+});
+
+test.describe('Currency selector', () => {
+  test('shows currency options in sidebar', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.getByText('PLN')).toBeVisible({ timeout: 8000 });
+    await expect(page.getByText('USD')).toBeVisible();
+    await expect(page.getByText('EUR')).toBeVisible();
+  });
 });
 
 test.describe('404 page', () => {
