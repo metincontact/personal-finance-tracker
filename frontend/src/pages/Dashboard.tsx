@@ -62,6 +62,7 @@ const CAT_LABEL: Record<string, string> = {
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 const ChartTip = ({ active, payload }: { active?: boolean; payload?: Array<{ value: number }> }) => {
+  const { fmt } = useCurrency();
   if (!active || !payload?.length) return null;
   return (
     <div style={{ background: '#0f1117', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '8px 14px', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}>
@@ -71,6 +72,7 @@ const ChartTip = ({ active, payload }: { active?: boolean; payload?: Array<{ val
 };
 
 const PieTip = ({ active, payload }: { active?: boolean; payload?: Array<{ name: string; value: number; payload: { color: string } }> }) => {
+  const { fmt } = useCurrency();
   if (!active || !payload?.length) return null;
   const d = payload[0]!;
   return (
