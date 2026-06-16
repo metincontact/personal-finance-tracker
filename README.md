@@ -70,6 +70,8 @@ Create `backend/.env`:
 ```env
 DATABASE_URL=postgresql://your-neon-connection-string
 PORT=3000
+JWT_SECRET=your-random-secret
+ADMIN_PASSWORD=your-password
 ```
 
 Run migrations and seed:
