@@ -17,7 +17,7 @@ export interface Transaction {
 }
 
 export interface Budget {
-  category: Category;
+  category: string;
   limit: number;
   spent: number;
 }

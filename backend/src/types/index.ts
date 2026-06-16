@@ -17,7 +17,7 @@ export interface Transaction {
 }
 
 export interface Budget {
-  category: Category;
+  category: string;
   limit: number;
   spent: number;
 }
@@ -25,6 +25,6 @@ export interface Budget {
 export interface MonthlySummary {
   month: string;
   totalSpent: number;
-  byCategory: Partial<Record<Category, number>>;
+  byCategory: Record<string, number>;
   budgets: Budget[];
 }

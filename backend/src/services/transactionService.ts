@@ -1,5 +1,5 @@
 import prisma from '../lib/prisma';
-import type { Category, Budget, MonthlySummary } from '../types';
+import type { Budget, MonthlySummary } from '../types';
 
 export async function getAllTransactions() {
   return prisma.transaction.findMany({
@@ -28,7 +28,7 @@ export async function getBudgets(year: number, month: number): Promise<Budget[]>
       .reduce((sum, t) => sum + t.amount, 0);
 
     return {
-      category: b.category as Category,
+      category: b.category,
       limit: b.limit,
       spent: parseFloat(spent.toFixed(2)),
     };
@@ -42,10 +42,9 @@ export async function getMonthlySummary(year: number, month: number): Promise<Mo
   ]);
 
   const byCategory = transactions.reduce((acc, t) => {
-    const cat = t.category as Category;
-    acc[cat] = parseFloat(((acc[cat] ?? 0) + t.amount).toFixed(2));
+    acc[t.category] = parseFloat(((acc[t.category] ?? 0) + t.amount).toFixed(2));
     return acc;
-  }, {} as Partial<Record<Category, number>>);
+  }, {} as Record<string, number>);
 
   const totalSpent = parseFloat(
     transactions.reduce((sum, t) => sum + t.amount, 0).toFixed(2)

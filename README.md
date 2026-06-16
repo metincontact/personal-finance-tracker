@@ -8,10 +8,11 @@ A personal finance dashboard that imports real bank transactions, categorises th
 
 ## Features
 
+- **Authentication** — password-protected login with JWT; all routes secured
 - **Dashboard** — monthly stat cards, spending trend (area chart), category breakdown (donut chart)
-- **Transactions** — table with month filter, search, CSV export, add, edit & delete
+- **Transactions** — table with month/category filter, search, CSV export, add, edit & delete
 - **PDF Import** — upload your Erste Bank statement PDF to sync real transactions automatically
-- **Budget** — per-category progress bars with inline limit editing
+- **Budget** — per-category progress bars with inline limit editing and custom category creation
 - **Reports** — bar chart comparison (spent vs budget), monthly summary
 - **Multi-currency** — live exchange rates; display amounts in PLN, USD, EUR, TRY or AZN
 - **Error handling** — retry states, toast notifications
@@ -122,13 +123,14 @@ personal-finance-tracker/
 │   ├── components/     # Sidebar, ErrorState, ToastStack, Skeleton
 │   ├── context/        # CurrencyContext (live FX rates, multi-currency fmt)
 │   ├── hooks/          # useToast
-│   ├── pages/          # Dashboard, Transactions, Budget, Reports
-│   ├── services/       # api.ts (Axios)
+│   ├── pages/          # Dashboard, Transactions, Budget, Reports, Login
+│   ├── services/       # api.ts (Axios + JWT interceptor)
 │   └── types/          # TypeScript interfaces
 │
 ├── backend/src/
 │   ├── controllers/    # transactionController, importController
-│   ├── routes/         # transactions, import
+│   ├── middleware/     # auth.ts (JWT verification)
+│   ├── routes/         # transactions, import, auth
 │   ├── services/       # transactionService, importService (PDF parser)
 │   └── lib/            # Prisma client
 │
